@@ -20,3 +20,8 @@ CI/CD → Docker → Kubernetes → Monitoring/Alerts → Rollback.
 - минимум 1 алерт, который реально срабатывает
 - documented rollback scenario
 - runbook в README
+
+## Local run (Docker)
+
+docker build -t crud-ultra:dev .
+docker run --rm -p 8000:8000 crud-ultra:dev
