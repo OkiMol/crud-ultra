@@ -44,3 +44,14 @@ kubectl apply -f k8s/ingress.yaml
 
 curl -H "Host: crud-ultra.local" http://localhost:8081/health
 
+## Troubleshooting
+
+### 404 через Ingress
+Если запросы через ingress возвращают `404 page not found`, возможен конфликт ingress controller (Traefik включён по умолчанию в k3s/k3d).
+
+Решение: запускать кластер с отключенным Traefik:
+
+k3d cluster create crud-ultra \
+  -p "8081:80@loadbalancer" \
+  -p "8443:443@loadbalancer" \
+  --k3s-arg "--disable=traefik@server:0"
