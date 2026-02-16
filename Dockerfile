@@ -35,7 +35,7 @@ COPY app /app/app
 # Ownership for non-root
 RUN chown -R app:app /app /opt/venv
 
-USER app
+USER 10001
 
 EXPOSE 8000
 

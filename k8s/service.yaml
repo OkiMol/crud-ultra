@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: crud-ultra
+  namespace: crud-ultra
+spec:
+  type: ClusterIP
+  selector:
+    app: crud-ultra
+  ports:
+    - port: 80
+      targetPort: 8000
