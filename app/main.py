@@ -1,10 +1,15 @@
-from fastapi import FastAPI, Response, HTTPException
+from fastapi import FastAPI, Response, HTTPException, Query
 from pydantic import BaseModel, Field
 from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_fastapi_instrumentator import Instrumentator
 from typing import Dict
 from uuid import uuid4
+import time
 
 app = FastAPI(title="CRUD Ultra")
+
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 REQUEST_COUNT = Counter(
     "app_requests_total",
@@ -76,3 +81,14 @@ def delete_item(item_id: str):
         raise HTTPException(status_code=404, detail="Item not found")
     del _STORE[item_id]
     return Response(status_code=204)
+
+@app.get("/debug/sleep")
+def debug_sleep(ms: int = Query(0, ge=0, le=5000)):
+    """Artificial latency for demo/testing (NOT for production)."""
+    time.sleep(ms / 1000)
+    return {"slept_ms": ms}
+
+@app.get("/debug/error")
+def debug_error():
+    """Artificial 500 for demo/testing (NOT for production)."""
+    raise HTTPException(status_code=500, detail="intentional error")

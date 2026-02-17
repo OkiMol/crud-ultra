@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: crud-ultra-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: crud-ultra.rules
+      rules:
+        - alert: CrudUltraDown
+          expr: (up{job="crud-ultra"} == 0) or (absent(up{job="crud-ultra"}) == 1)
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "crud-ultra is down"
+            description: "Prometheus cannot scrape crud-ultra /metrics."

@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: crud-ultra
   namespace: crud-ultra
+  labels:
+    app: crud-ultra
 spec:
   type: ClusterIP
   selector:
     app: crud-ultra
   ports:
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 8000
