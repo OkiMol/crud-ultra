@@ -1,0 +1,44 @@
+name: promote-to-cluster
+
+on:
+  workflow_run:
+    workflows: ["build-and-push-image"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Derive image tag from workflow_run SHA
+        id: vars
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          SHORT="${SHA::7}"
+          echo "tag=sha-${SHORT}" >> "$GITHUB_OUTPUT"
+
+      - name: Update kustomization image tag
+        run: |
+          set -euo pipefail
+          sed -i "s/^    newTag: .*/    newTag: ${{ steps.vars.outputs.tag }}/" k8s/kustomization.yaml
+          git diff
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: promote/${{ steps.vars.outputs.tag }}
+          title: "Promote image ${{ steps.vars.outputs.tag }}"
+          commit-message: "chore(deploy): promote image ${{ steps.vars.outputs.tag }}"
+          body: |
+            Promote image to cluster via GitOps.
+            Image tag: ${{ steps.vars.outputs.tag }}
+          labels: deploy

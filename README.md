@@ -6,7 +6,7 @@ CI/CD → Docker → Kubernetes → Monitoring/Alerts → Rollback.
 ## Stack
 - Python (FastAPI)
 - Docker
-- Kubernetes (k3s/minikube)
+- Kubernetes (k3s/k3d)
 - GitHub Actions
 - Prometheus + Grafana + Alertmanager
 - Loki (опционально)
